@@ -19,14 +19,26 @@ const stylesheet = ast.stylesheet;
 const rules
   = _.filter(stylesheet.rules, (rule) => rule.type === 'rule');
 
+const classNamesFromParsedSelector
+  = (parsed) =>
+      { if (parsed.type === 'ruleSet')
+          { return classNamesFromParsedSelector(parsed.rule) }
+        else if (parsed.type === 'rule')
+          { if (parsed.rule && parsed.classNames)
+              { return parsed.classNames.concat(classNamesFromParsedSelector(parsed.rule)) }
+            else if (parsed.classNames)
+              { return parsed.classNames }
+            else if (parsed.rule)
+              { return classNamesFromParsedSelector(parsed.rule) }
+          }
+      }
+
+
 const getClassNames
   = (selectors) =>
       _.flatMap
          ( _.filter(selectors, (selector) => _.startsWith(selector, '.'))
-         , (selector) =>
-              selectorParser.parse(selector)
-                .rule
-                .classNames
+         , (selector) => classNamesFromParsedSelector(selectorParser.parse(selector))
          );
 
 const classNames

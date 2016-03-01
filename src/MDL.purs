@@ -97,6 +97,9 @@ module MDL where
   layout :: ClassName
   layout = className "mdl-layout"
 
+  layoutIcon :: ClassName
+  layoutIcon = className "mdl-layout-icon"
+
   layoutSpacer :: ClassName
   layoutSpacer = className "mdl-layout-spacer"
 
@@ -2029,6 +2032,17 @@ module MDL.DataTable.Cell where
   _nonNumeric = className "mdl-data-table__cell--non-numeric"
 
 
+module MDL.DataTable.Header where
+
+  import Halogen.HTML.Core (ClassName, className)
+
+  _sortedAscending :: ClassName
+  _sortedAscending = className "mdl-data-table__header--sorted-ascending"
+
+  _sortedDescending :: ClassName
+  _sortedDescending = className "mdl-data-table__header--sorted-descending"
+
+
 module MDL.Dialog where
 
   import Halogen.HTML.Core (ClassName, className)
@@ -2083,11 +2097,17 @@ module MDL.Layout where
   _fixedTabs :: ClassName
   _fixedTabs = className "mdl-layout--fixed-tabs"
 
+  _largeScreenOnly :: ClassName
+  _largeScreenOnly = className "mdl-layout--large-screen-only"
+
   _noDesktopDrawerButton :: ClassName
   _noDesktopDrawerButton = className "mdl-layout--no-desktop-drawer-button"
 
   _noDrawerButton :: ClassName
   _noDrawerButton = className "mdl-layout--no-drawer-button"
+
+  _smallScreenOnly :: ClassName
+  _smallScreenOnly = className "mdl-layout--small-screen-only"
 
   container :: ClassName
   container = className "mdl-layout__container"
@@ -2131,6 +2151,9 @@ module MDL.Layout where
   tabPanel :: ClassName
   tabPanel = className "mdl-layout__tab-panel"
 
+  tabRippleContainer :: ClassName
+  tabRippleContainer = className "mdl-layout__tab-ripple-container"
+
   title :: ClassName
   title = className "mdl-layout__title"
 
@@ -2167,6 +2190,27 @@ module MDL.List where
 
   itemIcon :: ClassName
   itemIcon = className "mdl-list__item-icon"
+
+  itemPrimaryContent :: ClassName
+  itemPrimaryContent = className "mdl-list__item-primary-content"
+
+  itemSecondaryAction :: ClassName
+  itemSecondaryAction = className "mdl-list__item-secondary-action"
+
+  itemSecondaryContent :: ClassName
+  itemSecondaryContent = className "mdl-list__item-secondary-content"
+
+  itemSecondaryInfo :: ClassName
+  itemSecondaryInfo = className "mdl-list__item-secondary-info"
+
+  itemSubHeader :: ClassName
+  itemSubHeader = className "mdl-list__item-sub-header"
+
+  itemSubTitle :: ClassName
+  itemSubTitle = className "mdl-list__item-sub-title"
+
+  itemTextBody :: ClassName
+  itemTextBody = className "mdl-list__item-text-body"
 
 
 module MDL.List.Item where
@@ -2317,6 +2361,14 @@ module MDL.Navigation where
 
   link :: ClassName
   link = className "mdl-navigation__link"
+
+
+module MDL.Navigation.Link where
+
+  import Halogen.HTML.Core (ClassName, className)
+
+  _current :: ClassName
+  _current = className "mdl-navigation__link--current"
 
 
 module MDL.Progress where
@@ -2477,6 +2529,9 @@ module MDL.Tabs where
 
   panel :: ClassName
   panel = className "mdl-tabs__panel"
+
+  rippleContainer :: ClassName
+  rippleContainer = className "mdl-tabs__ripple-container"
 
   tab :: ClassName
   tab = className "mdl-tabs__tab"
