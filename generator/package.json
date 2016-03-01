@@ -1,0 +1,15 @@
+{
+  "name": "purescript-halogen-mdl",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "author": "Konstantin Zudov <co@zudov.me>",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "css": "^2.2.1",
+    "css-selector-parser": "^1.1.0",
+    "lodash": "^4.5.1",
+    "material-design-lite": "^1.1.1"
+  }
+}
