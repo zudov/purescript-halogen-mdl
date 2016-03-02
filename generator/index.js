@@ -11,6 +11,7 @@ const _ = require('lodash');
 const Generator = require('./output/Generator/index.js');
 
 var content = fs.readFileSync('node_modules/material-design-lite/material.css', { encoding: 'utf8' });
+// var content = fs.readFileSync('test.css', { encoding: 'utf8' });
 
 const ast = css.parse(content)
 
@@ -18,6 +19,20 @@ const stylesheet = ast.stylesheet;
 
 const rules
   = _.filter(stylesheet.rules, (rule) => rule.type === 'rule');
+
+const getSelectors
+  = (rule) => 
+      { if (rule.type === 'rule')
+          { return rule.selectors }
+        else if (rule.type === 'media')
+          { return _.flatMap(rule.rules, getSelectors)
+          }
+        else
+          { return [] }
+      }
+
+const selectors
+  = _.flatMap(stylesheet.rules, getSelectors)
 
 const classNamesFromParsedSelector
   = (parsed) =>
@@ -38,11 +53,16 @@ const getClassNames
   = (selectors) =>
       _.flatMap
          ( _.filter(selectors, (selector) => _.startsWith(selector, '.'))
-         , (selector) => classNamesFromParsedSelector(selectorParser.parse(selector))
+         , (selector) =>
+            { if (selector.includes('mdl-cell'))
+                { // console.log(selector)
+                }
+            ; return classNamesFromParsedSelector(selectorParser.parse(selector))
+            }
          );
 
 const classNames
-  = _.flatMap(rules, (rule) => getClassNames(rule.selectors));
+  = getClassNames(selectors)
 
 const mdlClassNames
   = _.uniq(_.filter(classNames, (className) => _.startsWith(className, 'mdl')));
