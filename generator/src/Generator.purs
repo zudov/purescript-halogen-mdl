@@ -1,26 +1,25 @@
 module Generator where
 
 import Prelude
+import Control.Alt ((<|>))
+import Data.Bifunctor (bimap, rmap)
+import Data.Either (Either, either)
+import Data.Foldable (foldMap)
+import Data.Monoid (mempty)
+import Data.Tuple (Tuple(..))
+import Text.Parsing.Simple (Parser, eof, fromCharList, item, many, notFollowedBy, parse, string)
 
-import Data.String as String
-import Control.Apply
-import Control.Alt
-import Data.Tuple
-import Data.Monoid
-import Data.Functor
-import Data.Either
-import Data.Foldable
-import Data.Maybe (fromMaybe)
-import Data.Map (Map())
+import Data.List (List())
+import Data.List as List
+import Data.Map (Map)
 import Data.Map as Map
+import Data.Maybe (fromMaybe)
+import Data.Set (Set)
+import Data.Set as Set
 import Data.StrMap (StrMap)
 import Data.StrMap as StrMap
-import Data.List as List
-import Data.Set (Set())
-import Data.Set as Set
-import Data.Bifunctor
-
-import Text.Parsing.Simple
+import Data.String (Pattern(..))
+import Data.String as String
 
 foreign import camelCase :: String -> String
 foreign import upperFirst :: String -> String
@@ -78,7 +77,7 @@ printMDLClass c = case c of
     -> block <> "__" <> element <> "--" <> modifier
 
 stripMDL :: String -> String
-stripMDL s = fromMaybe s (String.stripPrefix "mdl-" s)
+stripMDL s = fromMaybe s (String.stripPrefix (Pattern "mdl-") s)
 
 toClassNameDecl :: MDLClass -> Tuple ModuleName ClassNameDecl
 toClassNameDecl c = case c of
@@ -116,45 +115,45 @@ mdlClass :: ClassName -> Either String MDLClass
 mdlClass (ClassName className) =
   parse pMdlClass className
 
-pSegment :: Parser ClassName
+pSegment :: Parser String ClassName
 pSegment =
   ClassName <<< fromCharList
     <$> many (notFollowedBy (string "--" <|> string "__") *> item)
 
-pMdlClass :: Parser MDLClass
+pMdlClass :: Parser String MDLClass
 pMdlClass =
   pMdlBlock <|> pMdlElement <|> pMdlBlockModifier <|> pMdlElementModifier
 
-pMdlBlock :: Parser MDLClass
+pMdlBlock :: Parser String MDLClass
 pMdlBlock = Block <<< { block: _ } <$> (pSegment <* eof)
 
-pMdlElement :: Parser MDLClass
+pMdlElement :: Parser String MDLClass
 pMdlElement = do
   block <- pSegment
-  string "__"
+  _ <- string "__"
   element <- pSegment
   eof $> Element { block, element }
 
-pMdlBlockModifier :: Parser MDLClass
+pMdlBlockModifier :: Parser String MDLClass
 pMdlBlockModifier = do
   block <- pSegment
-  string "--"
+  _ <- string "--"
   modifier <- pSegment
   eof $> BlockModifier { block, modifier }
 
-pMdlElementModifier :: Parser MDLClass
+pMdlElementModifier :: Parser String MDLClass
 pMdlElementModifier = do
   block <- pSegment
-  string "__"
+  _ <- string "__"
   element <- pSegment
-  string "--"
+  _ <- string "--"
   modifier <- pSegment
   eof $> ElementModifier { block, element, modifier }
 
 
 generateModules :: Set ClassName -> Map ModuleName (Set ClassNameDecl)
 generateModules =
-  Set.toList
+  List.fromFoldable
     >>> foldMap
           (mdlClass
             >>> either
@@ -162,14 +161,15 @@ generateModules =
                   (toClassNameDecl
                       >>> rmap Set.singleton
                       >>> List.singleton))
-    >>> Map.fromListWith (<>)
+    >>> Map.fromFoldableWith (<>)
+
+gen1 :: Array ClassName -> List (Tuple ModuleName (Set ClassNameDecl))
+gen1 = Set.fromFoldable >>> generateModules >>> Map.toUnfoldable
 
 generateModules' :: Array ClassName -> StrMap (Array ClassNameDecl)
 generateModules' =
-  Set.fromFoldable
-    >>> generateModules
-    >>> Map.toList
+  gen1
     >>> map (bimap
                (\(ModuleName m) -> m)
-               (Set.toList >>> List.toUnfoldable))
-    >>> StrMap.fromList
+               Set.toUnfoldable)
+    >>> StrMap.fromFoldable
