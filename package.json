@@ -4,12 +4,14 @@
   "directories": {
     "test": "test"
   },
+  "scripts": {
+    "build": "pulp build"
+  },
   "author": "Konstantin Zudov <co@zudov.me>",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "css": "^2.2.1",
-    "css-selector-parser": "^1.1.0",
-    "lodash": "^4.5.1",
-    "material-design-lite": "^1.1.1"
+    "pulp": "^12.0.1",
+    "purescript-psa": "^0.3.9",
+    "purescript": "^0.11.0"
   }
 }

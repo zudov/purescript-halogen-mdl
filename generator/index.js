@@ -5,12 +5,14 @@ selectorParser.registerSelectorPseudos('has');
 selectorParser.registerNestingOperators('>', '+', '~');
 selectorParser.registerAttrEqualityMods('^', '$', '*', '~');
 selectorParser.enableSubstitutes();
+const path = require('path');
 const fs = require('fs');
+const fsExt = require('fs-extra');
 const _ = require('lodash');
 
-const Generator = require('./output/Generator/index.js');
+const Generator = require(path.resolve(__dirname, 'output/Generator/index.js'));
 
-var content = fs.readFileSync('node_modules/material-design-lite/material.css', { encoding: 'utf8' });
+var content = fs.readFileSync(path.resolve(__dirname, 'node_modules/material-design-lite/material.css'), { encoding: 'utf8' });
 // var content = fs.readFileSync('test.css', { encoding: 'utf8' });
 
 const ast = css.parse(content)
@@ -70,15 +72,13 @@ const mdlClassNames
 const renderClassName =
   (className) =>
 `  ${className.name} :: ClassName
-  ${className.name} = className "${className.className}"
+  ${className.name} = ClassName "${className.className}"
 `
-
-
 const renderModule =
   (module) =>
 `module ${module.moduleName} where
 
-${_.isEmpty(module.classes) ? "" : "  import Halogen.HTML.Core (ClassName, className)"}
+${_.isEmpty(module.classes) ? "" : "  import Halogen.HTML.Core (ClassName(..))"}
 
 ${_.map(module.classes, renderClassName).join('\n')}
 `
@@ -92,16 +92,9 @@ const renderMainModule =
   import DOM (DOM())
   import DOM.HTML.Types (HTMLElement())
 
-  import Halogen.HTML.Core (ClassName, className)
-  import Halogen.HTML.Properties.Indexed (IProp(), I)
-
-  class HasMDLInitializer i where
-    mdlInitializer :: HTMLElement -> i
-
-  initializer :: ∀ i r. HasMDLInitializer i => IProp (initializer :: I | r) i
-  initializer = Halogen.HTML.Properties.Indexed.initializer mdlInitializer
-
-  foreign import upgradeElement :: ∀ eff. HTMLElement -> Eff (dom :: DOM | eff) Unit
+  import Halogen.HTML.Core (ClassName(..))
+  
+  foreign import upgradeElement :: forall eff. HTMLElement -> Eff (dom :: DOM | eff) Unit
 
 ${[ 'mdl-js-button'
   , 'mdl-js-checkbox'
@@ -122,11 +115,22 @@ ${[ 'mdl-js-button'
 ${_.map(module.classes, renderClassName).join('\n')}
 `
 
+const writeModule = (moduleName, moduleCode) =>
+  {
+    var filePath = path.resolve(__dirname, "../src/" + moduleName.replace("\.", "/") + ".purs");
+    fsExt.ensureFileSync(filePath);
+    fs.writeFileSync(filePath, moduleCode);
+  }
+
 _.forEach(Generator["generateModules'"](mdlClassNames), (classes, moduleName) =>
   {
     if (moduleName === "MDL")
-      { console.log(renderMainModule({ moduleName, classes })); }
+      { 
+        writeModule(moduleName, renderMainModule({ moduleName, classes })); 
+      }
     else
-      { console.log(renderModule({ moduleName, classes })); }
+      { writeModule(moduleName, renderModule({ moduleName, classes })); }
   });
+
+
 
