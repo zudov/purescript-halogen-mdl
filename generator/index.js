@@ -117,7 +117,7 @@ ${_.map(module.classes, renderClassName).join('\n')}
 
 const writeModule = (moduleName, moduleCode) =>
   {
-    var filePath = path.resolve(__dirname, "../src/" + moduleName.replace("\.", "/") + ".purs");
+    var filePath = path.resolve(__dirname, "../src/" + moduleName.replace(/\./g, "/") + ".purs");
     fsExt.ensureFileSync(filePath);
     fs.writeFileSync(filePath, moduleCode);
   }
