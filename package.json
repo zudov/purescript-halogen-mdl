@@ -10,8 +10,8 @@
   "author": "Konstantin Zudov <co@zudov.me>",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "pulp": "^12.0.1",
-    "purescript-psa": "^0.3.9",
-    "purescript": "^0.11.0"
+    "pulp": "^11.0.2",
+    "purescript": "^0.11.6",
+    "purescript-psa": "^0.5.1"
   }
 }
